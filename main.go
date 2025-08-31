@@ -14,11 +14,18 @@ const (
 )
 
 func main() {
+	ctx := context.Background()
+
 	inputFile := flag.String("input", "./input.jpeg", "Path to input image file")
 	outputFile := flag.String("output", "./output.png", "Path to output image file")
 	flag.Parse()
 
-	ctx := context.Background()
+	if *inputFile == "" {
+		panic("input file path cannot be empty")
+	}
+	if *outputFile == "" {
+		panic("output file path cannot be empty")
+	}
 
 	apiKey := os.Getenv("GEMINI_API_KEY")
 	if apiKey == "" {
