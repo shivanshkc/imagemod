@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"flag"
 	"fmt"
 	"os"
 
@@ -10,12 +11,13 @@ import (
 
 const (
 	giveThemPrompt = "Generate a photorealistic image of the same person from the reference photo, but give them a hairstyle that suits them the most. It is essential to preserve their exact facial identity, ensuring they remain fully recognizable."
-
-	inputFile  = "./input/input.jpeg"
-	outputFile = "./output/output.png"
 )
 
 func main() {
+	inputFile := flag.String("input", "./input.jpeg", "Path to input image file")
+	outputFile := flag.String("output", "./output.png", "Path to output image file")
+	flag.Parse()
+
 	ctx := context.Background()
 
 	apiKey := os.Getenv("GEMINI_API_KEY")
@@ -23,9 +25,9 @@ func main() {
 		panic("GEMINI_API_KEY environment variable is required")
 	}
 
-	imageData, err := os.ReadFile(inputFile)
+	imageData, err := os.ReadFile(*inputFile)
 	if err != nil {
-		panic(fmt.Errorf(`failed to read input image file "%s": %w`, inputFile, err))
+		panic(fmt.Errorf(`failed to read input image file "%s": %w`, *inputFile, err))
 	}
 
 	client, err := genai.NewClient(ctx, &genai.ClientConfig{APIKey: apiKey})
@@ -58,8 +60,8 @@ func main() {
 		}
 
 		imageBytes := part.InlineData.Data
-		if err := os.WriteFile(outputFile, imageBytes, 0644); err != nil {
-			panic(fmt.Errorf(`failed to write output image to "%s": %w`, outputFile, err))
+		if err := os.WriteFile(*outputFile, imageBytes, 0644); err != nil {
+			panic(fmt.Errorf(`failed to write output image to "%s": %w`, *outputFile, err))
 		}
 	}
 }
